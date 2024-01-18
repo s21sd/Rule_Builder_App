@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Builder App</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* background: linear-gradient(110deg, #fdcd3b 60%, #ffed4b 60%); */
+            background: linear-gradient(-70deg, #fa7c30 50%, rgba(0, 0, 0, 0) 30%);
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+
+            color: black;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+            box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+            border-radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            border-radius: 12px;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        #buttons {
+            display: flex;
+            justify-content: start;
+            padding: 12px;
+        }
+
+        .btn {
+            background-color: green;
+        }
+
+        .feild1 {
+            margin-right: 12px;
+        }
+
+        button {
+            background-color: #fa7c30;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            margin: 4px;
+        }
+
+        #result {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        #table {
+            display: flex;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .delbtnrule {
+            margin-bottom: 18px;
+            margin-left: 2px;
+            background-color: black;
+        }
+
+
+
+
+        .condition {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .groupbtns {
+            position: absolute;
+            right: 0;
+        }
+
+        .delbtngrp {
+            position: absolute;
+            right: 34%;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Rule Builder App</h1>
+
+    <form id="queryForm">
+        <label for="tableName">Select Table:</label>
+        <select id="tableName" name="tableName">
+            {% for table in table_names %}
+            <option value="{{ table }}">{{ table }}</option>
+            {% endfor %}
+        </select>
+
+
+        <form class="forms" id="table">
+            <div <label for="numQueries">Number of Queries:</label>
+                <input type="number" id="numQueries" name="numQueries" min="1" onchange="generateQueryForms()" required>
+            </div>
+
+            <div class="condition">
+
+                <div>
+                    <label for="condition">Condition:</label>
+
+                    <select id="condition" name="condition" onchange="showHideDropdowns()">
+                        <option value="All">All</option>
+                        <option value="Any">Any</option>
+                        <option value="AtLeast">At Least</option>
+                        <option value="AtMost">At Most</option>
+                    </select>
+                    <div id="atLeastContainer" style="display: none;">
+                        <label for="atLeast">At Least:</label>
+                        <select id="atLeast" name="atLeast">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+
+                    <div id="atMostContainer" style="display: none;">
+                        <label for="atMost">At Most:</label>
+                        <select id="atMost" name="atMost">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <!-- Add more options as needed -->
+                        </select>
+                    </div>
+                </div>
+                <div class="groupbtns">
+                    <button onclick="addRule()"><i class="fa-solid fa-plus fa-lg" id="playbtn"
+                            style="--fa-primary-color: #e4dde9; --fa-secondary-color: #e9d0fa; padding-right: 4px;"></i>Add
+                        rule</button>
+                    <button onclick="addGroup()"><i class="fa-solid fa-circle-plus fa-lg" id="playbtn"
+                            style="--fa-primary-color: #e4dde9; --fa-secondary-color: #e9d0fa; padding-right: 4px;"></i>Add
+                        group</button>
+
+                </div>
+
+            </div>
+
+
+            <div class="addfeild">
+
+            </div>
+            <div class="newconditions">
+
+            </div>
+
+
+            <!-- <div id="buttons">
+                <button class="btn btn-success" id="btn-set">Set Rules</button>
+                <button class="btn btn-primary parse-sql" id="btn-get-sql" data target="import_export">Excute</button>
+            </div> -->
+
+            <button type="button" onclick="addCustomModification()">Add Custom Modification</button>
+
+            <button type="button" class="btn" onclick="submitQueries()">Submit</button>
+
+        </form>
+        <div id="result"></div>
+
+</body>
+<script src="https://kit.fontawesome.com/0ce72b976b.js" crossorigin="anonymous"></script>
+<script>
+    const addfeild = document.querySelector('.addfeild');
+    const newconditions = document.querySelector('.newconditions');
+    const groupbtns = document.querySelector('.groupbtns');
+
+    function addRule() {
+        var conditionDiv = document.createElement('div');
+        conditionDiv.classList.add('condition');
+
+        var fieldSelect = document.createElement('select');
+        var fields = ["Name", "Age", "Salary", "Working hours"];
+        for (var i = 0; i < fields.length; i++) {
+            var option = document.createElement('option');
+            option.value = fields[i];
+            option.text = fields[i];
+            fieldSelect.classList = 'feild1'
+            fieldSelect.appendChild(option);
+
+        }
+
+        var operationSelect = document.createElement('select');
+        var operations = ["Equal", "Greater than or Equal", "Less than or Equal", "Greater than", "Less than"];
+        for (var j = 0; j < operations.length; j++) {
+            var opOption = document.createElement('option');
+            opOption.value = operations[j];
+            opOption.text = operations[j];
+
+            operationSelect.classList = 'feild1'
+            operationSelect.appendChild(opOption);
+        }
+
+        var inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.placeholder = 'Enter value';
+        inputElement.classList = 'feild1'
+
+        // Create a delete button
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList = 'delbtnrule'
+        deleteButton.addEventListener('click', function () {
+            newconditions.removeChild(conditionDiv);
+        });
+
+        conditionDiv.appendChild(fieldSelect);
+        conditionDiv.appendChild(operationSelect);
+        conditionDiv.appendChild(inputElement);
+        conditionDiv.appendChild(deleteButton);
+
+        newconditions.appendChild(conditionDiv);
+    }
+
+    function addGroup() {
+        var conditionDiv = document.querySelector('.condition').cloneNode(true);
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList = 'delbtngrp'
+        deleteButton.addEventListener('click', function () {
+            newconditions.removeChild(conditionDiv);
+        });
+        conditionDiv.appendChild(deleteButton);
+        newconditions.appendChild(conditionDiv);
+    }
+
+</script>
+
+</html>
